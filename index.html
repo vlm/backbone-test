@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<script src="js/underscore.js"></script>
+<script src="js/jquery-1.9.1.js"></script>
+<script src="js/json2.js"></script>
+<script src="js/backbone.js"></script>
+<style>
+#error, #success {
+    display: none;
+}
+#success { color: darkgreen; }
+#error { color: darkred; }
+.block {
+    margin: auto;
+    width: 200px;
+}
+</style>
+</head>
+<body>
+
+<div id="menu"> <!-- Блок меню -->
+    <ul>
+        <li><a href="#!/">Start</a></li>
+        <li><a href="#!/success">Success</a></li>
+        <li><a href="#!/error">Error</a></li>
+    </ul>
+</div>
+
+<div id="start" class="block">
+    <div class="userplace">
+        <label for="username">Имя пользователя: </label>
+        <input type="text" id="username" />
+    </div>
+    <div class="buttonplace">
+        <input type="button" value="Проверить" />
+    </div>
+</div>
+<div id="error" class="block">
+    Ошибка такой пользователь не найден.
+</div>
+<div id="success" class="block">
+    Пользователь найден.
+</div>
+
+<script>
+var AppRouter = Backbone.Router.extend({
+    routes: {
+        "": "start", // Пустой hash-тэг
+        "!/": "start", // Начальная страница
+        "!/success": "success", // Блок удачи
+        "!/error": "error" // Блок ошибки
+    },
+
+    start: function () {
+        $(".block").hide(); // Прячем все блоки
+        $("#start").show(); // Показываем нужный
+    },
+
+    success: function () {
+        $(".block").hide();
+        $("#success").show();
+    },
+
+    error: function () {
+        $(".block").hide();
+        $("#error").show();
+    }
+});
+new AppRouter();
+
+Backbone.history.start();
+
+var Start = Backbone.View.extend({
+    el: $("#start"), // DOM элемент widget'а
+    events: {
+        "click input:button": "check", // Обработчик клика на кнопке "Проверить"
+        "keyup input:text": "keycheck"   // Обработчик нажатия кнопки
+    },
+    keycheck: function () {
+        if(event.keyIdentifier == "Enter")
+            this.check();
+    },
+    check: function () {
+        if (this.$("input:text").val() == "test") // Проверка текста
+            controller.navigate("!/success", true); // переход на страницу success
+        else
+            controller.navigate("!/error", true); // переход на страницу error
+    }
+});
+
+var start = new Start();
+</script>
+
+
+</body></html>
