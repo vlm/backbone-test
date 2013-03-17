@@ -53,6 +53,29 @@
 
 <script>
 
+// Модель сферического пользователя в вакууме.
+var UserNameModel = Backbone.Model.extend({
+   defaults: { "Name": "" }
+});
+
+// Модель целой плеяды пользователей, либо шайки родственников.
+var Family = Backbone.Collection.extend({
+    model: UserNameModel,
+
+    checkUser: function (username) { // Проверка пользователя
+        var found = this.find(function(user) {
+                // Выберем вьюху из коллекции с нужным нам именем.
+                return user.get("Name") == username
+        });
+        return found != null;
+    }
+});
+var myFamily = new Family([ // Моя семья
+    { Name: "Саша" },
+    { Name: "Юля" },
+    { Name: "Елизар" }
+]);
+
 // The most global model, containing all other models.
 var AppModel = Backbone.Model.extend({
     defaults: {
@@ -61,8 +84,6 @@ var AppModel = Backbone.Model.extend({
     }
 });
 var appModel = new AppModel();
-
-var Family = ["Саша", "Юля", "Елизар"]; // Моя семья
 
 var Block = Backbone.View.extend({
     el: $("#block"), // DOM элемент widget'а
@@ -94,7 +115,7 @@ var Block = Backbone.View.extend({
     },
     check: function () {
             var username = this.$("input:text").val();
-            var found = (_.contains(Family, username));
+            var found = myFamily.checkUser(username);
             appModel.set({ // Сохранение имени пользователя и состояния
                 "state": found ? "success" : "error",
                 "username": username
@@ -136,9 +157,7 @@ appModel.bind("change:state", function () { // подписка на смену 
         router.navigate("!/" + state, false);
 });
 
-
 Backbone.history.start();
-
 </script>
 
 
